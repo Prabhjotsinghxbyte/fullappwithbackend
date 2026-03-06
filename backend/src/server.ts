@@ -5,15 +5,15 @@ import bodyParser from "body-parser";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 
-import { typeDefs } from "./schema/TypeDefinitions.js";
-import { resolvers } from "./resolvers/UserResolvers";
+import { TypeDefinitions } from "./schema/TypeDefinitions.js";
+import { UserResolvers } from "./resolvers/UserResolvers.js";
 
 async function startServer() {
   const app = express();
 
   const server = new ApolloServer({
-    typeDefs,
-    resolvers,
+    typeDefs: TypeDefinitions,
+    resolvers: UserResolvers,
   });
 
   await server.start();

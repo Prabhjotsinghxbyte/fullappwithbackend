@@ -1,6 +1,6 @@
 import { gql } from "graphql-tag";
 
-export const typeDefs = gql`
+export const TypeDefinitions = gql`
   type User {
     id: ID!
     name: String!

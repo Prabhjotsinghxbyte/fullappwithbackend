@@ -5,7 +5,7 @@ type User = {
 
 let users: User[] = [];
 
-export const resolvers = {
+export const UserResolvers = {
   Query: {
     users: (): User[] => users,
   },
