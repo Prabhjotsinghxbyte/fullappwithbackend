@@ -4,7 +4,15 @@ export const typeDefs = `#graphql
     author: String
   }
 
+  type Todo {
+    id: Int
+    todo: String
+    completed: Boolean
+    userId: Int
+  }
+
   type Query {
     books: [Book]
-  }
-`;
+    todos: [Todo]
+    todo(id: Int!): Todo
+  }`;

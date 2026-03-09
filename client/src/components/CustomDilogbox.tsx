@@ -31,19 +31,16 @@ const CustomDilogbox = ({
   const handleClick = () => {
     if (Trigger === "Edit") {
       setTodos((prev) => prev.map((t) => (t.id === id ? { ...t, todo: value } : t)));
-
-      console.log("Edit button clicked!");
     } else if (Trigger === "Delete") {
       setTodos((prev) => prev.filter((t) => t.id !== id));
-      console.log("Delete button clicked!");
     } else if (Trigger === "Add New Todo") {
       if (userData) {
         const newTodo = { id: Date.now(), todo: value, completed: false, userId: userData.id };
         setTodos((prev) => [...prev, newTodo]);
       }
-      console.log("Button clicked!");
     }
   };
+
   return (
     <Dialog>
       <DialogTrigger>{Trigger}</DialogTrigger>
