@@ -1,15 +1,15 @@
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Link } from "react-router";
-
-type newUser = {
+import { useForm } from "react-hook-form";
+type NewUser = {
   id: number;
   username: string;
   email: string;
   password: string;
   confirmPassword: string;
-  [key: string]: string | number;
 };
+
 const fields = [
   {
     id: "username",
@@ -36,23 +36,23 @@ const fields = [
     label: "Confirm Password",
   },
 ];
+
 export const Signup = () => {
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const email = (form.elements.namedItem("email") as HTMLInputElement).value;
-    const username = (form.elements.namedItem("username") as HTMLInputElement).value;
-    const confirmPassword = (form.elements.namedItem("confirmPassword") as HTMLInputElement).value;
-    const password = (form.elements.namedItem("password") as HTMLInputElement).value;
-    const data: newUser = {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<Omit<NewUser, "id">>();
+  const password = watch("password");
+
+  const onSubmit = (data: Omit<NewUser, "id">) => {
+    const formData: NewUser = {
       id: Date.now(),
-      email,
-      username,
-      password,
-      confirmPassword,
+      ...data,
     };
 
-    console.log("signup form data", data);
+    console.log("signup form data", formData);
   };
 
   return (
@@ -62,22 +62,52 @@ export const Signup = () => {
           <h1 className="text-3xl font-bold">Create an account</h1>
           <p className="text-muted-foreground">Enter your details to get started</p>
         </div>
-        <form className="space-y-4" onSubmit={handleFormSubmit}>
+
+        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
           {fields.map(({ id, type, placeholder, label }) => (
             <div key={id} className="space-y-2">
-              <label htmlFor={id} className={"text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"}>
+              <label htmlFor={id} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 {label}
               </label>
-              <Input id={id} type={type} placeholder={placeholder} autoComplete={id} />
+              <Input
+                id={id}
+                type={type}
+                placeholder={placeholder}
+                autoComplete={id}
+                className={errors[id as keyof Omit<NewUser, "id">] ? "border-red-500" : ""}
+                {...register(id as keyof Omit<NewUser, "id">, {
+                  required: `${label} is required`,
+                  ...(id === "confirmPassword" && {
+                    validate: (value) => value === password || "Passwords do not match",
+                  }),
+                  ...(id === "email" && {
+                    pattern: {
+                      value: /^\S+@\S+\.\S+$/,
+                      message: "Please enter a valid email",
+                    },
+                  }),
+                  ...(id === "password" && {
+                    pattern: {
+                      value: /^.{8,}$/,
+                      message: "Password should contain 8 char",
+                    },
+                  }),
+                })}
+              />
+
+              {errors[id as keyof Omit<NewUser, "id">] && (
+                <p className="text-red-500 text-sm">{errors[id as keyof Omit<NewUser, "id">]?.message as string}</p>
+              )}
             </div>
           ))}
+
           <Button type="submit" className="w-full">
             Sign up
           </Button>
         </form>
 
         <div className="text-center text-sm">
-          <span className="text-muted-foreground">Already have an account? </span>
+          <span className="text-muted-foreground">Already have an account?</span>{" "}
           <Link to="/login" className="text-primary hover:underline">
             Sign in
           </Link>

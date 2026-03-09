@@ -1,23 +1,29 @@
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { UserContext } from "../contextApi/UserContextProvider";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { Link, useNavigate } from "react-router";
 import { userLogin } from "../api/api";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
-} from "../components/ui/alert-dialog";
+import { useForm } from "react-hook-form";
+
+interface changePasswordDetails {
+  username: string;
+  resetKey: string;
+  newPassword: string;
+  confirmPassword: string;
+}
 
 const ForgetModule = () => {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<changePasswordDetails>();
+
+  const newPasswprd = watch("newPassword");
+
   const navigator = useNavigate();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [passwordMatch, setPasswordMatch] = useState(true);
 
   const { setUserData, setLogedin } = useContext(UserContext);
 
@@ -48,38 +54,28 @@ const ForgetModule = () => {
     },
   ];
 
-  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const username = formData.get("username") as string;
-    const newPassword = formData.get("newPassword") as string;
-    const confirmPassword = formData.get("confirmPassword") as string;
-    const isMatch = newPassword === confirmPassword;
+  const onSubmit = async (data: changePasswordDetails) => {
+    console.log(data);
+    const { username } = data;
+    const logindata = { username, password: username + "pass" };
 
-    if (!isMatch) {
-      setPasswordMatch(false);
-      setDialogOpen(true);
-    } else {
-      const logindata = { username, password: username + "pass" };
+    try {
+      const apiResponse = await userLogin(logindata);
 
-      try {
-        const apiResponse = await userLogin(logindata);
-
-        if (apiResponse) {
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
-          localStorage.removeItem("image");
-          localStorage.removeItem("userInfo");
-        }
-        localStorage.setItem("accessToken", apiResponse.accessToken);
-        localStorage.setItem("refreshToken", apiResponse.refreshToken);
-        localStorage.setItem("image", apiResponse.image);
-        setUserData(apiResponse);
-        setLogedin(true);
-        navigator("/");
-      } catch {
-        setDialogOpen(true);
+      if (apiResponse) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("image");
+        localStorage.removeItem("userInfo");
       }
+      localStorage.setItem("accessToken", apiResponse.accessToken);
+      localStorage.setItem("refreshToken", apiResponse.refreshToken);
+      localStorage.setItem("image", apiResponse.image);
+      setUserData(apiResponse);
+      setLogedin(true);
+      navigator("/");
+    } catch {
+      navigator("/login");
     }
   };
 
@@ -91,39 +87,31 @@ const ForgetModule = () => {
           <p className="text-muted-foreground">Enter your email address and we'll send you a OTP to reset your password</p>
         </div>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className="space-y-2">
             {inputs.map(({ id, label, placeholder, type }) => (
               <div key={"l" + id}>
                 <label htmlFor={id} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                   {label}
                 </label>
-                <Input key={id} id={id} name={id} type={type} placeholder={placeholder} aria-invalid={!passwordMatch && id === "confirmPassword"} />
+
+                <Input
+                  key={id}
+                  id={id}
+                  type={type}
+                  autoComplete={id}
+                  placeholder={placeholder}
+                  {...register(id as keyof changePasswordDetails, {
+                    required: `${label} is required`,
+                    ...(id === "confirmPassword" && { validate: (value) => value === newPasswprd || "Passwords do not match" }),
+                  })}
+                />
+                {errors[id as keyof changePasswordDetails] && (
+                  <p className="text-red-500 text-sm">{errors[id as keyof changePasswordDetails]?.message as string}</p>
+                )}
               </div>
             ))}
-            <AlertDialog open={dialogOpen}>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>{passwordMatch ? "Password Changed" : "Password not match"}</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    {passwordMatch ? "Your new password is set" : "Type Same New Password And Confirm Password"}
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel
-                    variant={"outline"}
-                    size={"default"}
-                    onClick={() => {
-                      setDialogOpen(false);
-                      setPasswordMatch(true);
-                    }}>
-                    Ok
-                  </AlertDialogCancel>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
           </div>
-
           <Button type="submit" className="w-full">
             Change Password
           </Button>

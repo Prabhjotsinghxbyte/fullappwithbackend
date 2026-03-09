@@ -2,23 +2,28 @@ import { userLogin } from "../api/api";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Link } from "react-router";
-import React, { useContext, useState } from "react";
+import { useContext } from "react";
 import { UserContext } from "../contextApi/UserContextProvider";
 import { useNavigate } from "react-router";
+import { useForm } from "react-hook-form";
 
+interface loginUserDetails {
+  username: string;
+  password: string;
+}
 const Login = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<loginUserDetails>();
   const navigator = useNavigate();
   const { setUserData, setLogedin } = useContext(UserContext)!;
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setErrorMessage(null);
-    const formData = new FormData(e.currentTarget);
-    const username = formData.get("username") as string;
-    const password = formData.get("password") as string;
 
+  const onSubmit = async (data: loginUserDetails) => {
+    console.log(data);
     try {
-      const apiResponse = await userLogin({ username, password });
+      const apiResponse = await userLogin(data);
       if (apiResponse) {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
@@ -32,8 +37,8 @@ const Login = () => {
       setLogedin(true);
       navigator("/");
     } catch (error) {
+      alert("user name or password wrong");
       console.error(error);
-      setErrorMessage("Login failed. Please check your username and password.");
     }
   };
 
@@ -45,25 +50,27 @@ const Login = () => {
           <p className="text-muted-foreground">Enter your credentials to access your account</p>
         </div>
 
-        <form className="space-y-4" onSubmit={(e) => handleSubmit(e)}>
+        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className="space-y-2">
             <label htmlFor="username" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Username
             </label>
-            <Input id="username" name="username" type="text" placeholder="Enter your username" autoComplete="username" required />
+            <Input
+              id="username"
+              type="text"
+              placeholder="Enter your username"
+              autoComplete="username"
+              {...register("username", { required: `User Name is required` })}
+            />
+            {errors.username && <p className="text-red-500 text-sm">{errors.username.message as string}</p>}
           </div>
-
           <div className="space-y-2">
             <label htmlFor="password" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Password
             </label>
-            <Input id="password" name="password" type="password" autoComplete="password" required />
+            <Input id="password" type="password" autoComplete="password" {...register("password", {})} />
+            {errors.password && <p className="text-red-500 text-sm">{errors.password.message as string}</p>}
           </div>
-          {errorMessage ? (
-            <p className="text-sm text-red-500" role="alert">
-              {errorMessage}
-            </p>
-          ) : null}
 
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
