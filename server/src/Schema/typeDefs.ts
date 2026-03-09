@@ -1,18 +1,20 @@
 export const typeDefs = `#graphql
-  type Book {
-    title: String
-    author: String
-  }
-
   type Todo {
-    id: Int
-    todo: String
-    completed: Boolean
-    userId: Int
-  }
+  id: Int
+  todo: String
+  completed: Boolean
+  userId: Int
+}
 
-  type Query {
-    books: [Book]
-    todos: [Todo]
-    todo(id: Int!): Todo
-  }`;
+type User {
+  id: Int
+  firstName: String
+  lastName: String
+  todos: [Todo]
+}
+
+type Query {
+  users: [User]
+  user(id: Int!): User
+  todos: [Todo]
+}`;

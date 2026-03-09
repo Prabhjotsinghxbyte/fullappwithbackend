@@ -1,7 +1,7 @@
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { UserContext } from "../contextApi/UserContextProvider";
-import { useContext, useRef, useState } from "react";
+import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { userLogin } from "../api/api";
 import {
@@ -16,17 +16,11 @@ import {
 
 const ForgetModule = () => {
   const navigator = useNavigate();
-
-  const [dilagOpen, setDialogOpen] = useState<boolean>(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [passwordMatch, setPasswordMatch] = useState(true);
 
   const { setUserData, setLogedin } = useContext(UserContext);
 
-  const form = useRef<HTMLFormElement>(null);
-
-  const newPassword = (form.current?.elements.namedItem("newPassword") as HTMLInputElement)?.value as string;
-  const confirmPassword = (form.current?.elements.namedItem("confirmPassword") as HTMLInputElement)?.value as string;
-
-  const passwordMatch = newPassword === confirmPassword;
   const inputs = [
     {
       label: "User Name",
@@ -42,30 +36,31 @@ const ForgetModule = () => {
     },
     {
       label: "New Password",
-      type: "text",
+      type: "password",
       id: "newPassword",
       placeholder: "New Password",
     },
     {
       label: "Confirm Password",
-      type: "text",
+      type: "password",
       id: "confirmPassword",
       placeholder: "Confirm Password",
     },
   ];
 
-  const HandleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const username = formData.get("username") as string;
+    const newPassword = formData.get("newPassword") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+    const isMatch = newPassword === confirmPassword;
 
-    if (newPassword !== confirmPassword) {
+    if (!isMatch) {
+      setPasswordMatch(false);
       setDialogOpen(true);
     } else {
-      const logindata = {
-        username: username,
-        password: username + "pass",
-      };
+      const logindata = { username, password: username + "pass" };
 
       try {
         const apiResponse = await userLogin(logindata);
@@ -82,8 +77,7 @@ const ForgetModule = () => {
         setUserData(apiResponse);
         setLogedin(true);
         navigator("/");
-      } catch (error) {
-        console.error(error);
+      } catch {
         setDialogOpen(true);
       }
     }
@@ -97,24 +91,17 @@ const ForgetModule = () => {
           <p className="text-muted-foreground">Enter your email address and we'll send you a OTP to reset your password</p>
         </div>
 
-        <form className="space-y-4" ref={form} onSubmit={HandleSubmit}>
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
-            {inputs.map((input) => (
-              <div key={"l" + input.id}>
-                <label htmlFor={input.id} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                  {input.label}
+            {inputs.map(({ id, label, placeholder, type }) => (
+              <div key={"l" + id}>
+                <label htmlFor={id} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  {label}
                 </label>
-                <Input
-                  key={input.id}
-                  id={input.id}
-                  name={input.id}
-                  type={input.type}
-                  placeholder={input.placeholder}
-                  aria-invalid={!passwordMatch && input.id === "confirmPassword"}
-                />
+                <Input key={id} id={id} name={id} type={type} placeholder={placeholder} aria-invalid={!passwordMatch && id === "confirmPassword"} />
               </div>
             ))}
-            <AlertDialog open={dilagOpen}>
+            <AlertDialog open={dialogOpen}>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>{passwordMatch ? "Password Changed" : "Password not match"}</AlertDialogTitle>
@@ -123,7 +110,15 @@ const ForgetModule = () => {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel onClick={() => setDialogOpen(false)}>Ok</AlertDialogCancel>
+                  <AlertDialogCancel
+                    variant={"outline"}
+                    size={"default"}
+                    onClick={() => {
+                      setDialogOpen(false);
+                      setPasswordMatch(true);
+                    }}>
+                    Ok
+                  </AlertDialogCancel>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>

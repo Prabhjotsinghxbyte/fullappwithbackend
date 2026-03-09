@@ -36,6 +36,7 @@ const Home = () => {
         setTodos(userTodos.todos ?? []);
       } catch {
         console.log("error");
+        navigator("/login");
       } finally {
         setLoading(false);
       }

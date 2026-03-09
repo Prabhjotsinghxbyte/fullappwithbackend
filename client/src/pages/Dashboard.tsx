@@ -13,8 +13,8 @@ const Dashboard = () => {
     const fetchData = async () => {
       const accessToken = localStorage.getItem("accessToken");
       const refreshToken = localStorage.getItem("refreshToken");
-      const tokens = accessToken || refreshToken;
-      if (!tokens) {
+      const tokens = accessToken === null || refreshToken === null;
+      if (tokens) {
         navigator("/login");
       } else {
         try {
