@@ -1,37 +1,46 @@
 import { gql } from "@apollo/client";
 
-export const getTodosByUserid = gql`
-  query GetTodosByUser($userId: Int!) {
-    todosByUser(userId: $userId) {
+export const loginMutation = gql`
+  mutation Login($username: String!, $password: String!) {
+    login(username: $username, password: $password) {
+      accessToken
+      refreshToken
+    }
+  }
+`;
+
+export const getTodos = gql`
+  query GetTodos {
+    todos {
       id
       todo
       completed
     }
   }
 `;
+
 export const addTodoMutation = gql`
-  mutation addTodo($input: addTodoInput!) {
+  mutation AddTodo($input: AddTodoInput!) {
     addTodo(input: $input) {
       id
       todo
       completed
-      userId
     }
   }
 `;
+
 export const updateTodoMutation = gql`
-  mutation updateTodo($input: updateTodoInput!) {
+  mutation UpdateTodo($input: UpdateTodoInput!) {
     updateTodo(input: $input) {
       id
       todo
       completed
-      userId
     }
   }
 `;
 
 export const deleteTodoMutation = gql`
-  mutation deleteTodo($id: Int!) {
+  mutation DeleteTodo($id: Int!) {
     deleteTodo(id: $id)
   }
 `;

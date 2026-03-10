@@ -8,19 +8,19 @@
   {
     "id": 3,
     "todo": "Watch a classic movie",
-    "completed": true,
+    "completed": false,
     "userId": 1
   },
   {
     "id": 4,
     "todo": "Watch a documentary",
-    "completed": false,
+    "completed": true,
     "userId": 1
   },
   {
     "id": 5,
     "todo": "Invest in cryptocurrency",
-    "completed": false,
+    "completed": true,
     "userId": 1
   },
   {

@@ -1,40 +1,47 @@
 export const typeDefs = `#graphql
-  type Todo {
-    id: Int!
-    todo: String!
-    completed: Boolean!
-    userId: Int!
-  }
 
-  type User {
-    id: Int!
-    firstName: String!
-    lastName: String!
-    todos: [Todo]
-  }
+type Todo {
+  id: Int
+  todo: String
+  completed: Boolean
+  userId: Int
+}
 
-  type Query {
-    users: [User]
-    user(id: Int!): User
-    todos: [Todo]
-    todosByUser(userId: Int!): [Todo]
-  }
+type User {
+  id: Int
+  firstName: String
+  lastName: String
+  username: String
+  image: String
+  todos: [Todo]
+}
 
-  input addTodoInput {
-    todo: String!
-    completed: Boolean!
-    userId: Int!
-  }
+type AuthPayload {
+  accessToken: String
+  refreshToken: String
+}
 
-  input updateTodoInput {
-    id: Int!
-    todo: String
-    completed: Boolean
-  }
+input AddTodoInput {
+  todo: String!
+  completed: Boolean!
+}
 
-  type Mutation {
-    addTodo(input: addTodoInput!): Todo
-    updateTodo(input: updateTodoInput!): Todo
-    deleteTodo(id: Int!): Boolean
-  }
+input UpdateTodoInput {
+  id: Int!
+  todo: String
+  completed: Boolean
+}
+
+type Query {
+  users: [User]
+  user(id: Int!): User
+  todos: [Todo]
+}
+
+type Mutation {
+  login(username: String!, password: String!): AuthPayload
+  addTodo(input: AddTodoInput!): Todo
+  updateTodo(input: UpdateTodoInput!): Todo
+  deleteTodo(id: Int!): Boolean
+}
 `;

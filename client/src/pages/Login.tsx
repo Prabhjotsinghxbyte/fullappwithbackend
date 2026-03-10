@@ -1,41 +1,53 @@
-import { userLogin } from "../api/api";
+import { useNavigate } from "react-router";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Link } from "react-router";
-import { useContext } from "react";
-import { UserContext } from "../contextApi/UserContextProvider";
-import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
+import { useMutation } from "@apollo/client/react";
+import { loginMutation } from "../api/querys";
 
 interface loginUserDetails {
   username: string;
   password: string;
 }
+interface tokens {
+  login: {
+    accessToken: string;
+    refreshToken: string;
+    __typename: string;
+  };
+}
 const Login = () => {
+  const navigator = useNavigate();
+  const [login] = useMutation(loginMutation);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<loginUserDetails>();
-  const navigator = useNavigate();
-  const { setUserData, setLogedin } = useContext(UserContext)!;
 
   const onSubmit = async (data: loginUserDetails) => {
     console.log(data);
     try {
-      const apiResponse = await userLogin(data);
-      if (apiResponse) {
+      const response = await login({
+        variables: {
+          username: data.username,
+          password: data.password,
+        },
+      });
+      if (response) {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
-        localStorage.removeItem("image");
-        localStorage.removeItem("userInfo");
       }
-      localStorage.setItem("accessToken", apiResponse.accessToken);
-      localStorage.setItem("refreshToken", apiResponse.refreshToken);
-      localStorage.setItem("image", apiResponse.image);
-      setUserData(apiResponse);
-      setLogedin(true);
-      navigator("/");
+      console.log(response);
+      if (response.data) {
+        const tokens = response.data as tokens;
+        const accessToken = tokens.login.accessToken;
+        const refreshToken = tokens.login.refreshToken;
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+        navigator("/");
+      }
     } catch (error) {
       alert("user name or password wrong");
       console.error(error);
