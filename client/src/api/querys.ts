@@ -10,7 +10,7 @@ export const getTodosByUserid = gql`
   }
 `;
 export const addTodoMutation = gql`
-  mutation addTodo($input: AddTodoInput!) {
+  mutation addTodo($input: addTodoInput!) {
     addTodo(input: $input) {
       id
       todo

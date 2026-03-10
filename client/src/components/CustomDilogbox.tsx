@@ -14,7 +14,6 @@ import { UserContext } from "../contextApi/UserContextProvider";
 import { useContext, useState } from "react";
 import { useMutation } from "@apollo/client/react";
 import { addTodoMutation } from "../api/querys";
-import { type TodoData } from "../assets/Types";
 
 const CustomDilogbox = ({
   Trigger,
@@ -42,7 +41,6 @@ const CustomDilogbox = ({
       if (userData) {
         const newTodo = { todo: value, completed: false, userId: 1 };
         /* setTodos((prev) => [...prev, newTodo]); */
-
         const response = await addTodo({
           variables: {
             input: newTodo,

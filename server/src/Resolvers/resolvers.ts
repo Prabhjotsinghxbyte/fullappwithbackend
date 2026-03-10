@@ -1,71 +1,84 @@
-import { Users } from "../Data/Users.js";
-import { Todos } from "../Data/Todos.js";
+import fs from "fs";
+import path from "path";
 
-type TodosByUserArgs = {
-  userId: number;
+const todosPath = path.join(process.cwd(), "src/Data/todos.json");
+const usersPath = path.join(process.cwd(), "src/Data/users.json");
+
+const readTodos = () => {
+  return JSON.parse(fs.readFileSync(todosPath, "utf-8"));
 };
 
-type AddTodoArgs = {
-  input: {
-    todo: string;
-    completed: boolean;
-    userId: number;
-  };
+const writeTodos = (todos: any) => {
+  fs.writeFileSync(todosPath, JSON.stringify(todos, null, 2));
 };
 
-type UpdateTodoArgs = {
-  input: {
-    id: number;
-    todo?: string;
-    completed?: boolean;
-  };
+const readUsers = () => {
+  return JSON.parse(fs.readFileSync(usersPath, "utf-8"));
 };
 
 export const resolvers = {
   Query: {
-    users: () => Users,
-    user: (_: unknown, { id }: { id: number }) => Users.find((user) => user.id === id),
+    users: () => {
+      return readUsers();
+    },
 
-    todos: () => Todos,
+    user: (_: unknown, { id }: { id: number }) => {
+      const users = readUsers();
+      return users.find((u: any) => u.id === id);
+    },
 
-    todosByUser: (_: unknown, { userId }: TodosByUserArgs) => {
-      return Todos.filter((todo) => todo.userId === userId);
+    todos: () => {
+      return readTodos();
+    },
+
+    todosByUser: (_: unknown, { userId }: { userId: number }) => {
+      const todos = readTodos();
+      return todos.filter((t: any) => t.userId === userId);
     },
   },
 
   Mutation: {
-    addTodo: (_: unknown, { input }: AddTodoArgs) => {
+    addTodo: (_: unknown, { input }: any) => {
+      const todos = readTodos();
+
       const newTodo = {
-        id: Todos.length + 1,
+        id: todos.length + 1,
         ...input,
       };
 
-      Todos.push(newTodo);
+      todos.push(newTodo);
+
+      writeTodos(todos);
+
       return newTodo;
     },
 
-    updateTodo: (_: unknown, { input }: UpdateTodoArgs) => {
-      const todo = Todos.find((t) => t.id === input.id);
+    updateTodo: (_: unknown, { input }: any) => {
+      const todos = readTodos();
 
-      if (!todo) {
-        throw new Error("Todo not found");
+      const index = todos.findIndex((t: any) => t.id === input.id);
+
+      if (index === -1) {
+        throw new Error("todo not found");
       }
 
-      if (input.todo !== undefined) {
-        todo.todo = input.todo;
-      }
+      const updatedTodo = {
+        ...todos[index],
+        ...input,
+      };
 
-      if (input.completed !== undefined) {
-        todo.completed = input.completed;
-      }
+      todos[index] = updatedTodo;
 
-      return todo;
+      writeTodos(todos);
+
+      return updatedTodo;
     },
   },
 
   User: {
-    todos: (parent: { id: number }) => {
-      return Todos.filter((todo) => todo.userId === parent.id);
+    todos: (parent: any) => {
+      const todos = readTodos();
+      return todos.filter((t: any) => t.userId === parent.id);
     },
   },
 };

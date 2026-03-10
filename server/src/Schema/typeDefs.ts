@@ -1,28 +1,16 @@
 export const typeDefs = `#graphql
   type Todo {
-    id: Int
-    todo: String
-    completed: Boolean
-    userId: Int
-  }
-
-  type User {
-    id: Int
-    firstName: String
-    lastName: String
-    todos: [Todo]
-  }
-
-  input AddTodoInput {
+    id: Int!
     todo: String!
     completed: Boolean!
     userId: Int!
   }
 
-  input UpdateTodoInput {
+  type User {
     id: Int!
-    todo: String
-    completed: Boolean
+    firstName: String!
+    lastName: String!
+    todos: [Todo]
   }
 
   type Query {
@@ -32,8 +20,20 @@ export const typeDefs = `#graphql
     todosByUser(userId: Int!): [Todo]
   }
 
+  input addTodoInput {
+    todo: String!
+    completed: Boolean!
+    userId: Int!
+  }
+
+  input updateTodoInput {
+    id: Int!
+    todo: String
+    completed: Boolean
+  }
+
   type Mutation {
-    addTodo(input: AddTodoInput!): Todo
-    updateTodo(input: UpdateTodoInput!): Todo
+    addTodo(input: addTodoInput!): Todo
+    updateTodo(input: updateTodoInput!): Todo
   }
 `;
