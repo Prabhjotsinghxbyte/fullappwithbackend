@@ -5,8 +5,9 @@ import { Link } from "react-router";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@apollo/client/react";
 import { loginMutation } from "../api/querys";
+import CustomAlert from "@/components/commanComponents/CustomAlert";
 
-interface loginUserDetails {
+interface LoginUserDetails {
   username: string;
   password: string;
 }
@@ -14,19 +15,18 @@ interface tokens {
   login: {
     accessToken: string;
     refreshToken: string;
-    __typename: string;
   };
 }
 const Login = () => {
   const navigator = useNavigate();
-  const [login] = useMutation(loginMutation);
+  const [login] = useMutation<tokens>(loginMutation);
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<loginUserDetails>();
+  } = useForm<LoginUserDetails>();
 
-  const onSubmit = async (data: loginUserDetails) => {
+  const onSubmit = async (data: LoginUserDetails) => {
     console.log(data);
     try {
       const response = await login({
@@ -35,13 +35,9 @@ const Login = () => {
           password: data.password,
         },
       });
-      if (response) {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-      }
       console.log(response);
       if (response.data) {
-        const tokens = response.data as tokens;
+        const tokens = response.data;
         const accessToken = tokens.login.accessToken;
         const refreshToken = tokens.login.refreshToken;
         localStorage.setItem("accessToken", accessToken);
@@ -49,7 +45,8 @@ const Login = () => {
         navigator("/");
       }
     } catch (error) {
-      alert("user name or password wrong");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
       console.error(error);
     }
   };
@@ -80,7 +77,18 @@ const Login = () => {
             <label htmlFor="password" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Password
             </label>
-            <Input id="password" type="password" autoComplete="password" {...register("password", {})} />
+            <Input
+              id="password"
+              type="password"
+              autoComplete="password"
+              {...register("password", {
+                required: `Password is required`,
+                pattern: {
+                  value: /^.{8,}$/,
+                  message: "Password should contain at least 8 characters",
+                },
+              })}
+            />
             {errors.password && <p className="text-red-500 text-sm">{errors.password.message as string}</p>}
           </div>
 
@@ -115,6 +123,7 @@ const Login = () => {
           </Link>
         </div>
       </div>
+      <CustomAlert description="wrong Password" title="wrongpass" />
     </div>
   );
 };
