@@ -6,12 +6,6 @@
     "userId": 1
   },
   {
-    "id": 2,
-    "todo": "Memorize a poem",
-    "completed": true,
-    "userId": 1
-  },
-  {
     "id": 3,
     "todo": "Watch a classic movie",
     "completed": true,
@@ -85,13 +79,7 @@
   },
   {
     "id": 15,
-    "todo": "edited 1",
-    "completed": false,
-    "userId": 1
-  },
-  {
-    "id": 16,
-    "todo": "new todo added 1",
+    "todo": "edited 2",
     "completed": false,
     "userId": 1
   }

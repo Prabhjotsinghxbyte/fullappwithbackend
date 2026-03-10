@@ -73,6 +73,16 @@ export const resolvers = {
 
       return updatedTodo;
     },
+
+    deleteTodo: (_: unknown, { id }: { id: number }) => {
+      const todos = readTodos();
+
+      const filteredTodos = todos.filter((t: any) => t.id !== id);
+
+      writeTodos(filteredTodos);
+
+      return true;
+    },
   },
 
   User: {

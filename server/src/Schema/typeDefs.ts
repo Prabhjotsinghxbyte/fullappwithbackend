@@ -35,5 +35,6 @@ export const typeDefs = `#graphql
   type Mutation {
     addTodo(input: addTodoInput!): Todo
     updateTodo(input: updateTodoInput!): Todo
+    deleteTodo(id: Int!): Boolean
   }
 `;

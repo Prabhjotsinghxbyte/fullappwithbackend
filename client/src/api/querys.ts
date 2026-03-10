@@ -19,3 +19,19 @@ export const addTodoMutation = gql`
     }
   }
 `;
+export const updateTodoMutation = gql`
+  mutation updateTodo($input: updateTodoInput!) {
+    updateTodo(input: $input) {
+      id
+      todo
+      completed
+      userId
+    }
+  }
+`;
+
+export const deleteTodoMutation = gql`
+  mutation deleteTodo($id: Int!) {
+    deleteTodo(id: $id)
+  }
+`;
