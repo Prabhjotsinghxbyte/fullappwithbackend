@@ -12,6 +12,9 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { UserContext } from "../contextApi/UserContextProvider";
 import { useContext, useState } from "react";
+import { useMutation } from "@apollo/client/react";
+import { addTodoMutation } from "../api/querys";
+import { type TodoData } from "../assets/Types";
 
 const CustomDilogbox = ({
   Trigger,
@@ -26,17 +29,26 @@ const CustomDilogbox = ({
   hideinput?: boolean;
   id: number | string;
 }) => {
+  const [addTodo] = useMutation(addTodoMutation);
+
   const { userData, setTodos } = useContext(UserContext)!;
   const [value, setValue] = useState("");
-  const handleClick = () => {
+  const handleClick = async () => {
     if (Trigger === "Edit") {
       setTodos((prev) => prev.map((t) => (t.id === id ? { ...t, todo: value } : t)));
     } else if (Trigger === "Delete") {
       setTodos((prev) => prev.filter((t) => t.id !== id));
     } else if (Trigger === "Add New Todo") {
       if (userData) {
-        const newTodo = { id: Date.now(), todo: value, completed: false, userId: userData.id };
-        setTodos((prev) => [...prev, newTodo]);
+        const newTodo = { todo: value, completed: false, userId: 1 };
+        /* setTodos((prev) => [...prev, newTodo]); */
+
+        const response = await addTodo({
+          variables: {
+            input: newTodo,
+          },
+        });
+        console.log(response.data.addTodo);
       }
     }
   };

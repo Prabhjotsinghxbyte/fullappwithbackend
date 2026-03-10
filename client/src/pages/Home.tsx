@@ -1,15 +1,24 @@
 import { useNavigate } from "react-router";
 import { UserContext } from "../contextApi/UserContextProvider";
 import { useContext, useEffect, useState } from "react";
+import { GetUserTodos } from "../api/api";
+import { GetUserDetails } from "../api/api";
 import { Item, ItemContent } from "../components/ui/item";
 import CustomDilogbox from "../components/CustomDilogbox";
-import { GetUserTodos } from "../api/api";
 import { Checkbox } from "../components/ui/checkbox";
-import { GetUserDetails } from "../api/api";
 import { Spinner } from "../components/ui/spinner";
+import { useQuery } from "@apollo/client/react";
+import { type TodoData } from "../assets/Types";
+import { getTodosByUserid } from "../api/querys";
 
 const Home = () => {
-  const navigator = useNavigate();
+  const { loading, error, data } = useQuery<{ todosByUser: TodoData[] }, { userId: number }>(getTodosByUserid, { variables: { userId: 1 } });
+
+  const myList: TodoData[] = data?.todosByUser;
+
+  console.log(data);
+
+  /* const navigator = useNavigate();
   const { todos, setTodos, userData } = useContext(UserContext)!;
   const [loading, setLoading] = useState(true);
 
@@ -43,7 +52,7 @@ const Home = () => {
     };
 
     fetchData();
-  }, []);
+  }, []); */
 
   if (loading) {
     return (
@@ -58,7 +67,7 @@ const Home = () => {
     <section className="flex flex-col gap-6 h-full w-full items-center justify-center bg-linear-to-br from-slate-50 via-sky-50 to-indigo-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       <h1 className="font-bold text-2xl">Todos List</h1>
       <div className="flex w-full max-w-xl flex-col gap-6">
-        {todos.map((todo) => (
+        {/* {todos.map((todo) => (
           <Item variant={"outline"} key={`todo-${todo.id}`}>
             <ItemContent className={todo.completed ? "line-through" : ""}>{todo.todo}</ItemContent>
             <Checkbox
@@ -67,6 +76,20 @@ const Home = () => {
                 setTodos((prev) => prev.map((t) => (t.id === todo.id ? { ...t, completed: !t.completed } : t)));
               }}
             />
+            <CustomDilogbox id={todo.id} Trigger={"Edit"} Title={"Edit Todo"} Deccription={"Edit your todo"} />
+            <CustomDilogbox
+              id={todo.id}
+              Trigger={"Delete"}
+              Title={"Delete Todo"}
+              Deccription={"Are you sure you want to delete this todo?"}
+              hideinput={true}
+            />
+          </Item>
+        ))} */}
+        {myList.map((todo: TodoData) => (
+          <Item variant={"outline"} key={`todo-${todo.id}`}>
+            <ItemContent className={todo.completed ? "line-through" : ""}>{todo.todo}</ItemContent>
+            <Checkbox checked={todo.completed} />
             <CustomDilogbox id={todo.id} Trigger={"Edit"} Title={"Edit Todo"} Deccription={"Edit your todo"} />
             <CustomDilogbox
               id={todo.id}
