@@ -6,6 +6,9 @@ import { useForm } from "react-hook-form";
 import { useMutation } from "@apollo/client/react";
 import { loginMutation } from "../api/querys";
 import CustomAlert from "@/components/commanComponents/CustomAlert";
+import { useState } from "react";
+import { UserContext } from "../contextApi/UserContextProvider";
+import { useContext } from "react";
 
 interface LoginUserDetails {
   username: string;
@@ -19,7 +22,9 @@ interface tokens {
 }
 const Login = () => {
   const navigator = useNavigate();
+  const {setLogedin} = useContext(UserContext);
   const [login] = useMutation<tokens>(loginMutation);
+  const [openAlert, setOpenAlert] = useState<true | false>(false);
   const {
     register,
     handleSubmit,
@@ -42,12 +47,14 @@ const Login = () => {
         const refreshToken = tokens.login.refreshToken;
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
+        setLogedin(true);
         navigator("/");
       }
     } catch (error) {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       console.error(error);
+      setOpenAlert(true);
     }
   };
 
@@ -123,7 +130,7 @@ const Login = () => {
           </Link>
         </div>
       </div>
-      <CustomAlert description="wrong Password" title="wrongpass" />
+      <CustomAlert openAlert={openAlert} onClick={() => setOpenAlert(false)} description="wrong Password" title="wrongpass" />
     </div>
   );
 };
