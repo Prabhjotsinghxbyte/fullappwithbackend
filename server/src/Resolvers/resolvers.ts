@@ -77,6 +77,18 @@ export const resolvers = {
         refreshToken,
       };
     },
+    signup: (_: unknown, { input }: any, context: any) => {
+      const users = readUsers();
+      const user = users.find((u: any) => String(u.username) === String(input.username));
+      const email = users.find((u: any) => String(u.email) === String(input.email));
+      if (user) {
+        return "userName already exist"
+      }
+      if (email) {
+        return "email already exist"
+      }
+
+    },
 
     resetPassword: (_: unknown, { username, email, password }: { username: string, email: string, password: string }) => {
       const users = readUsers();

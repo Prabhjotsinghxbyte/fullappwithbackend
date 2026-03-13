@@ -51,7 +51,6 @@ export const Signup = () => {
       id: Date.now(),
       ...data,
     };
-
     console.log("signup form data", formData);
   };
 
