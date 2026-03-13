@@ -20,6 +20,11 @@ const writeTodos = (todos: any) => {
 const readUsers = () => {
   return JSON.parse(fs.readFileSync(usersPath, "utf-8"));
 };
+const writeUsers = (users: any) => {
+
+  fs.writeFileSync(usersPath, JSON.stringify(users, null, 2));
+
+}
 
 export const resolvers = {
   Query: {
@@ -73,6 +78,24 @@ export const resolvers = {
       };
     },
 
+    resetPassword: (_: unknown, { username, email, password }: { username: string, email: string, password: string }) => {
+      const users = readUsers();
+
+      const user = users.find((u: any) => String(u.username) === String(username));
+
+
+      if (!user) {
+        return "user name not found"
+      } else {
+        if (String(user.email) !== String(email)) {
+          return "invalid email"
+        }
+        const userWithNewPassword = { ...user, password: password }
+        const updatedUsers = users.map((u: any) => u.id === user.id ? userWithNewPassword : u);
+        writeUsers(updatedUsers)
+        return "Password reset successfully";
+      }
+    },
 
     refreshToken: (_: unknown, { token }: { token: string }) => {
       try {

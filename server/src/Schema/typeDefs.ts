@@ -106,6 +106,7 @@ type Query {
   
 type Mutation {
   login(username: String!, password: String!): AuthPayload
+  resetPassword(username: String!, email: String! , password: String!): String
   refreshToken(token: String!): AuthPayload
   addTodo(input: AddTodoInput!): Todo
   updateTodo(input: UpdateTodoInput!): Todo

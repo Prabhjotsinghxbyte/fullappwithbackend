@@ -52,7 +52,11 @@ export const refreshTokenMutation = gql`
     }
   }
 `;
-
+export const resetPasswordMutation = gql`
+  mutation ResetPassword($username: String!, $email: String!, $password: String!) {
+    resetPassword(username: $username, email: $email, password: $password)
+  }
+`;
 export const getCurrentUser = gql`
   query GetMe {
     me {
