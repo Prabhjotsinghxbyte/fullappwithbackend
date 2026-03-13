@@ -4,12 +4,11 @@ import { Input } from "../components/ui/input";
 import { Link } from "react-router";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@apollo/client/react";
-import { loginMutation } from "../api/querys";
+import { loginMutation } from "../apolloClient/querys";
 import CustomAlert from "@/components/commanComponents/CustomAlert";
 import { useState } from "react";
 import { UserContext } from "../contextApi/UserContextProvider";
 import { useContext } from "react";
-
 interface LoginUserDetails {
   username: string;
   password: string;
@@ -21,8 +20,8 @@ interface tokens {
   };
 }
 const Login = () => {
-  const navigator = useNavigate();
-  const {setLogedin} = useContext(UserContext);
+  const navigate = useNavigate();
+  const { setLogedin } = useContext(UserContext);
   const [login] = useMutation<tokens>(loginMutation);
   const [openAlert, setOpenAlert] = useState<true | false>(false);
   const {
@@ -32,7 +31,6 @@ const Login = () => {
   } = useForm<LoginUserDetails>();
 
   const onSubmit = async (data: LoginUserDetails) => {
-    console.log(data);
     try {
       const response = await login({
         variables: {
@@ -40,7 +38,6 @@ const Login = () => {
           password: data.password,
         },
       });
-      console.log(response);
       if (response.data) {
         const tokens = response.data;
         const accessToken = tokens.login.accessToken;
@@ -48,7 +45,7 @@ const Login = () => {
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
         setLogedin(true);
-        navigator("/");
+        navigate("/");
       }
     } catch (error) {
       localStorage.removeItem("accessToken");
@@ -107,7 +104,7 @@ const Login = () => {
                 name="remember"
                 className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                 checked
-                onChange={() => {}}
+                onChange={() => { }}
               />
               <label htmlFor="remember" className="text-sm text-muted-foreground">
                 Remember me

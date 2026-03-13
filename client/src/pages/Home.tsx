@@ -3,15 +3,16 @@ import TodoChangeDialogBox from "../components/TodoChangeDialogBox";
 import { Spinner } from "../components/ui/spinner";
 import { useQuery } from "@apollo/client/react";
 import { type TodoData } from "../assets/Types";
-import { getTodos } from "../api/querys";
-
+import { getTodos } from "../apolloClient/querys";
+import { useNavigate } from "react-router";
 interface todos {
   todos: TodoData[];
 }
 const Home = () => {
   const { loading, error, data } = useQuery(getTodos);
-
-  if (data === undefined) {
+  const navigate = useNavigate();
+  if (error) {
+    navigate("/login");
     return (
       <div className="flex h-full flex-col items-center justify-center bg-linear-to-br from-slate-50 via-sky-50 to-indigo-100 p-6 text-slate-700 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 dark:text-slate-200">
         <Spinner />
@@ -19,7 +20,7 @@ const Home = () => {
       </div>
     );
   }
-  if (loading) {
+  if (loading || data === undefined) {
     return (
       <div className="flex h-full flex-col items-center justify-center bg-linear-to-br from-slate-50 via-sky-50 to-indigo-100 p-6 text-slate-700 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 dark:text-slate-200">
         <Spinner />
@@ -27,19 +28,7 @@ const Home = () => {
       </div>
     );
   }
-  if (error) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center bg-linear-to-br from-slate-50 via-sky-50 to-indigo-100 p-6 text-slate-700 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 dark:text-slate-200">
-        <Spinner />
-        <span className="text-lg tabular-nums">Somthig went wrong login Again</span>
-      </div>
-    );
-  }
-
-  console.log("data", data);
   const myList = (data as todos).todos;
-  console.log((data as todos).todos);
-
   return (
     <section className="flex flex-col gap-6 h-full w-full items-center justify-center bg-linear-to-br from-slate-50 via-sky-50 to-indigo-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       <h1 className="font-bold text-2xl">Todos List</h1>

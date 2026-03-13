@@ -3,7 +3,7 @@ import { Input } from "../components/ui/input";
 import { UserContext } from "../contextApi/UserContextProvider";
 import { useContext } from "react";
 import { Link, useNavigate } from "react-router";
-import { userLogin } from "../api/api";
+import { userLogin } from "../apolloClient/api";
 import { useForm } from "react-hook-form";
 
 interface changePasswordDetails {
@@ -23,7 +23,7 @@ const ForgetModule = () => {
 
   const newPasswprd = watch("newPassword");
 
-  const navigator = useNavigate();
+  const navigate = useNavigate();
 
   const { setUserData, setLogedin } = useContext(UserContext);
 
@@ -55,7 +55,6 @@ const ForgetModule = () => {
   ];
 
   const onSubmit = async (data: changePasswordDetails) => {
-    console.log(data);
     const { username } = data;
     const logindata = { username, password: username + "pass" };
 
@@ -73,9 +72,9 @@ const ForgetModule = () => {
       localStorage.setItem("image", apiResponse.image);
       setUserData(apiResponse);
       setLogedin(true);
-      navigator("/");
+      navigate("/");
     } catch {
-      navigator("/login");
+      navigate("/login");
     }
   };
 
