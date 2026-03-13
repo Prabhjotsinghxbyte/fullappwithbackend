@@ -1,13 +1,12 @@
-import { Item, ItemContent } from "../components/ui/item";
 import TodoChangeDialogBox from "../components/TodoChangeDialogBox";
+import { type TodoData, type todos } from "../assets/Types";
+import { Item, ItemContent } from "../components/ui/item";
 import { Spinner } from "../components/ui/spinner";
-import { useQuery } from "@apollo/client/react";
-import { type TodoData } from "../assets/Types";
 import { getTodos } from "../apolloClient/querys";
+import { useQuery } from "@apollo/client/react";
 import { useNavigate } from "react-router";
-interface todos {
-  todos: TodoData[];
-}
+
+
 const Home = () => {
   const { loading, error, data } = useQuery(getTodos);
   const navigate = useNavigate();

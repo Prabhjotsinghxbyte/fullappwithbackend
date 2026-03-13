@@ -1,9 +1,9 @@
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Link, useNavigate } from "react-router";
-import { useForm } from "react-hook-form";
 import { resetPasswordMutation } from "@/apolloClient/querys";
 import { useMutation } from "@apollo/client/react";
+import { Link, useNavigate } from "react-router";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 interface changePasswordDetails {

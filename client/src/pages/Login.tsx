@@ -1,36 +1,27 @@
-import { useNavigate } from "react-router";
+import { type LoginCredentials, type tokens } from "@/assets/Types";
+import { UserContext } from "../contextApi/UserContextProvider";
+import { loginMutation } from "../apolloClient/querys";
+import { useMutation } from "@apollo/client/react";
+import { useNavigate, Link } from "react-router";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
-import { Link } from "react-router";
 import { useForm } from "react-hook-form";
-import { useMutation } from "@apollo/client/react";
-import { loginMutation } from "../apolloClient/querys";
-import CustomAlert from "@/components/commanComponents/CustomAlert";
-import { useState } from "react";
-import { UserContext } from "../contextApi/UserContextProvider";
-import { useContext } from "react";
-interface LoginUserDetails {
-  username: string;
-  password: string;
-}
-interface tokens {
-  login: {
-    accessToken: string;
-    refreshToken: string;
-  };
-}
+import { useContext } from "react"
+import { toast } from "sonner";
+
+
+
 const Login = () => {
   const navigate = useNavigate();
   const { setLogedin } = useContext(UserContext);
   const [login] = useMutation<tokens>(loginMutation);
-  const [openAlert, setOpenAlert] = useState<true | false>(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginUserDetails>();
+  } = useForm<LoginCredentials>();
 
-  const onSubmit = async (data: LoginUserDetails) => {
+  const onSubmit = async (data: LoginCredentials) => {
     try {
       const response = await login({
         variables: {
@@ -51,7 +42,7 @@ const Login = () => {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       console.error(error);
-      setOpenAlert(true);
+      toast.error("Invalid credentials");
     }
   };
 
@@ -127,7 +118,6 @@ const Login = () => {
           </Link>
         </div>
       </div>
-      <CustomAlert openAlert={openAlert} onClick={() => setOpenAlert(false)} description="wrong Password" title="wrongpass" />
     </div>
   );
 };

@@ -1,9 +1,9 @@
-import { useNavigate } from "react-router";
-import { type UserDetails } from "../assets/Types";
 import DashboardCard from "../components/DashboardCards";
-import { Spinner } from "../components/ui/spinner";
 import { getCurrentUser } from "@/apolloClient/querys";
+import { type UserDetails } from "../assets/Types";
+import { Spinner } from "../components/ui/spinner";
 import { useQuery } from "@apollo/client/react";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
 
 const Dashboard = () => {
