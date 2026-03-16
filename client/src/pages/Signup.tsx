@@ -10,7 +10,14 @@ type NewUser = {
   confirmPassword: string;
 };
 
+
 const fields = [
+  {
+    id: "phone",
+    type: "tel",
+    placeholder: "Enter your phone number",
+    label: "Phone Number",
+  },
   {
     id: "username",
     type: "text",
@@ -90,6 +97,13 @@ export const Signup = () => {
                       value: /^.{8,}$/,
                       message: "Password should contain 8 char",
                     },
+                  }),
+                  ...(id === "phone" && {
+                    pattern: {
+                      value: /^[0-9]{3}-[0-9]{3}-[0-9]{4}$/,
+                      message: "Phone number should contain 10 digits",
+                    }, maxLength: 12,
+                    minLength: 10,
                   }),
                 })}
               />
